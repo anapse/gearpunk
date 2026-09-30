@@ -59,6 +59,7 @@ export class GameEngine {
   public cameraY: number = 0;
   public lavaY: number = 720;
   private screenShake: number = 0;
+  private flashTimer: number = 0;
 
   // Scores & Progression
   public scoreState: GameScoreState = {
@@ -332,6 +333,9 @@ export class GameEngine {
     this.lastJumpedGearId = this.currentGearId;
     this.jumpCooldownTimer = 0.22;
     this.currentGearId = null;
+    
+    // JUICE: Small shake on jump
+    this.screenShake = Math.max(this.screenShake, 5);
 
     // High energy, large soar jumps calibrated for climbing between gears
     if (dir === 'UP_LEFT') {
@@ -415,7 +419,11 @@ export class GameEngine {
     }
 
     if (this.screenShake > 0) {
-      this.screenShake = Math.max(0, this.screenShake - dt * 20);
+      this.screenShake = Math.max(0, this.screenShake - dt * 30);
+    }
+
+    if (this.flashTimer > 0) {
+      this.flashTimer -= dt;
     }
 
     // 1. Update Gears
@@ -441,7 +449,8 @@ export class GameEngine {
     for (const gear of this.gears) {
       if (gear.isExploded) continue;
 
-      gear.rotation += gear.rotationSpeed * dt;
+      const rotSpeed = gear.type === 'FROZEN' ? gear.rotationSpeed * 1.2 : gear.rotationSpeed;
+      gear.rotation += rotSpeed * dt;
 
       if (gear.type === 'EXPLOSIVE' && gear.isArmed && gear.fuseTimer !== undefined) {
         const prevSec = Math.floor(gear.fuseTimer);
@@ -499,10 +508,23 @@ export class GameEngine {
       this.playerVx = (this.playerX - gear.x) * 0.15;
       this.playerVy = -8;
       this.playerState = PlayerState.DAMAGED;
+
+      // JUICE: Extra shockwave on player hit
+      this.particles.push({
+        x: this.playerX,
+        y: this.playerY,
+        vx: 0, vy: 0,
+        color: '#ef4444',
+        size: 150,
+        life: 0.4,
+        maxLife: 0.4,
+        type: 'shockwave'
+      });
     }
   }
 
   private updatePlayer(dt: number) {
+    const zone = getZoneForY(this.playerY);
     // --- 1. PLAYER ON GEAR (CONTINUOUS ROTATION ON HUGE RIM) ---
     if (this.currentGearId !== null) {
       const gear = this.gears.find(g => g.id === this.currentGearId);
@@ -517,6 +539,32 @@ export class GameEngine {
 
         // Active continuous rotation along the gear rim
         this.currentGearAngleOffset += gear.rotationSpeed * dt;
+
+        // SLIPPERY MECHANIC: Slide towards bottom in slippery zones
+        if (zone.isSlippery) {
+          // Gravity effect on angle: try to move towards Math.PI / 2 (down)
+          const targetSlide = Math.PI / 2;
+          let diff = targetSlide - this.currentGearAngleOffset;
+          // Normalize diff
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          
+          this.currentGearAngleOffset += diff * 1.5 * dt;
+
+          if (Math.random() < 0.2) {
+            this.particles.push({
+              x: this.playerX,
+              y: this.playerY,
+              vx: (Math.random() - 0.5) * 2,
+              vy: Math.random() * 2,
+              color: '#38bdf8',
+              size: 2,
+              life: 0.15,
+              maxLife: 0.15,
+              type: 'bubble'
+            });
+          }
+        }
 
         this.playerFacing = gear.rotationSpeed >= 0 ? 1 : -1;
 
@@ -679,7 +727,7 @@ export class GameEngine {
       }
 
       const pDist = Math.hypot(this.playerX - item.x, (this.playerY - 14) - item.y);
-      if (pDist < 28) {
+      if (pDist < 42) {
         this.collectItem(item);
       }
     }
@@ -688,6 +736,10 @@ export class GameEngine {
   private collectItem(item: Collectible) {
     item.collected = true;
     soundManager.playCollect(item.type);
+    
+    // JUICE: Screen shake and flash
+    this.screenShake = 8;
+    this.flashTimer = 0.08;
 
     switch (item.type) {
       case 'LIGHTNING':
@@ -717,28 +769,61 @@ export class GameEngine {
         this.scoreState.activeSlowMoTimer = 8.0;
         this.addFloatingText('⏱ ¡SLOW MOTION!', item.x, item.y, '#fbbf24');
         break;
+      case 'RUBY':
+        this.addScore(250, item.x, item.y, '#ef4444', '+250 🧧');
+        break;
     }
 
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 20; i++) {
       const a = Math.random() * Math.PI * 2;
-      const spd = 1.5 + Math.random() * 4;
+      const spd = 2.0 + Math.random() * 6;
+      const color = this.getCollectibleHex(item.type);
       this.particles.push({
         x: item.x,
         y: item.y,
         vx: Math.cos(a) * spd,
         vy: Math.sin(a) * spd,
-        color: '#ffffff',
-        size: 2 + Math.random() * 3,
-        life: 0.35,
-        maxLife: 0.35,
-        type: 'star'
+        color: color,
+        size: 4 + Math.random() * 4,
+        life: 0.4,
+        maxLife: 0.4,
+        type: 'flare'
       });
+    }
+
+    // Add shockwave
+    this.particles.push({
+      x: item.x,
+      y: item.y,
+      vx: 0,
+      vy: 0,
+      color: 'rgba(255, 255, 255, 0.6)',
+      size: 100,
+      life: 0.3,
+      maxLife: 0.3,
+      type: 'shockwave'
+    });
+  }
+
+  private getCollectibleHex(type: string): string {
+    switch (type) {
+      case 'LIGHTNING': return '#fde047';
+      case 'HEART': return '#ef4444';
+      case 'DIAMOND': return '#38bdf8';
+      case 'STAR': return '#f59e0b';
+      case 'MAGNET': return '#38bdf8';
+      case 'CLOCK': return '#fbbf24';
+      case 'RUBY': return '#dc2626';
+      default: return '#ffffff';
     }
   }
 
   private addScore(pts: number, x: number, y: number, color: string, text: string) {
     this.scoreState.score += pts;
     this.addFloatingText(text, x, y, color);
+    
+    // JUICE: Tiny shake on score
+    this.screenShake = Math.max(this.screenShake, 3);
 
     if (this.scoreState.score > this.scoreState.highScore) {
       if (!this.isNewRecord && this.scoreState.highScore > 0) {
@@ -757,7 +842,7 @@ export class GameEngine {
       y: y,
       color: color,
       alpha: 1.0,
-      scale: 1.0,
+      scale: 1.5, // Start large for "pop"
       life: 0.8,
       maxLife: 0.8
     });
@@ -825,6 +910,21 @@ export class GameEngine {
     this.addFloatingText(`-0.5 ❤️ ${reason}`, this.playerX, this.playerY - 20, '#ef4444');
     this.notifyUI();
 
+    // JUICE: Hit particles
+    for (let i = 0; i < 15; i++) {
+      this.particles.push({
+        x: this.playerX,
+        y: this.playerY,
+        vx: (Math.random() - 0.5) * 10,
+        vy: (Math.random() - 0.5) * 10,
+        color: '#ffffff',
+        size: 3 + Math.random() * 3,
+        life: 0.3,
+        maxLife: 0.3,
+        type: 'spark'
+      });
+    }
+
     if (this.scoreState.hearts <= 0) {
       this.triggerGameOver();
     }
@@ -865,7 +965,7 @@ export class GameEngine {
       }
     }
 
-    if (this.scoreState.height >= 1300 && this.screenState === 'PLAYING') {
+    if (this.scoreState.height >= 9000 && this.screenState === 'PLAYING') {
       this.triggerVictory();
     }
   }
@@ -890,8 +990,13 @@ export class GameEngine {
         this.floatingTexts.splice(i, 1);
         continue;
       }
-      t.y -= 25 * dt;
+      t.y -= 35 * dt;
       t.alpha = t.life / t.maxLife;
+      // "Pop" animation: scale down to 1.0 quickly
+      if (t.scale > 1.0) {
+        t.scale -= 2 * dt;
+        if (t.scale < 1.0) t.scale = 1.0;
+      }
     }
   }
 
@@ -940,7 +1045,10 @@ export class GameEngine {
     // 6. Lava at bottom
     this.renderer.renderLava(this.lavaY, this.cameraY);
 
-    // 7. Floating Texts
+    // 7. Flash effect
+    this.renderer.renderFlash(this.flashTimer * 4);
+
+    // 8. Floating Texts
     this.renderer.renderFloatingTexts(this.floatingTexts, this.cameraY);
 
     ctx.restore();

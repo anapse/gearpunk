@@ -14,7 +14,7 @@ import { HighScoreModal } from './components/HighScoreModal';
 import { GameOverModal } from './components/GameOverModal';
 import { VictoryModal } from './components/VictoryModal';
 import { PauseModal } from './components/PauseModal';
-import { TributeModal } from './components/TributeModal';
+import { ContactModal } from './components/ContactModal';
 
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -38,7 +38,7 @@ export default function App() {
 
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showHighScore, setShowHighScore] = useState(false);
-  const [showTribute, setShowTribute] = useState(false);
+  const [showContact, setShowContact] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
   // Initialize Canvas & Game Engine
@@ -169,7 +169,7 @@ export default function App() {
             onPlay={() => engineRef.current?.startGame()}
             onHowToPlay={() => setShowHowToPlay(true)}
             onHighScore={() => setShowHighScore(true)}
-            onTribute={() => setShowTribute(true)}
+            onContact={() => setShowContact(true)}
             isMuted={isMuted}
             onToggleMute={toggleMute}
           />
@@ -223,9 +223,9 @@ export default function App() {
           />
         )}
 
-        {/* Tribute Modal */}
-        {showTribute && (
-          <TributeModal onClose={() => setShowTribute(false)} />
+        {/* Contact Modal */}
+        {showContact && (
+          <ContactModal onClose={() => setShowContact(false)} />
         )}
       </div>
     </main>

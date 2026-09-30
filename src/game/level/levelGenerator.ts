@@ -81,6 +81,116 @@ export const ZONES: ZoneConfig[] = [
     smallGearChance: 0.35,
     electricChance: 0.25,
     lavaRiseSpeed: 25
+  },
+  {
+    zoneIndex: 6,
+    name: 'Zona 6: Cumbres Nevadas',
+    subtitle: 'Engranajes congelados y vientos gélidos',
+    startY: -26000,
+    endY: -35000,
+    bgColorTop: '#e0f2fe',
+    bgColorBottom: '#7dd3fc',
+    ambientLight: 'rgba(186, 230, 253, 0.2)',
+    gearSpeedMult: 1.4,
+    explosiveChance: 0.15,
+    smallGearChance: 0.4,
+    electricChance: 0.1,
+    lavaRiseSpeed: 28
+  },
+  {
+    zoneIndex: 7,
+    name: 'Zona 7: Cúspide de Cristal',
+    subtitle: 'El límite del mundo, engranajes ultra-rápidos',
+    startY: -35000,
+    endY: -48000,
+    bgColorTop: '#f8fafc',
+    bgColorBottom: '#bae6fd',
+    ambientLight: 'rgba(255, 255, 255, 0.3)',
+    gearSpeedMult: 1.6,
+    explosiveChance: 0.2,
+    smallGearChance: 0.5,
+    electricChance: 0.15,
+    lavaRiseSpeed: 32
+  },
+  {
+    zoneIndex: 8,
+    name: 'Zona 8: Núcleo Estelar',
+    subtitle: 'El gran final entre las estrellas',
+    startY: -48000,
+    endY: -65000,
+    bgColorTop: '#020617',
+    bgColorBottom: '#1e1b4b',
+    ambientLight: 'rgba(99, 102, 241, 0.15)',
+    gearSpeedMult: 1.8,
+    explosiveChance: 0.25,
+    smallGearChance: 0.6,
+    electricChance: 0.2,
+    lavaRiseSpeed: 36
+  },
+  {
+    zoneIndex: 9,
+    name: 'Zona 9: Abismo de Vapor',
+    subtitle: 'Vapor cegador y engranajes veloces',
+    startY: -65000,
+    endY: -85000,
+    bgColorTop: '#334155',
+    bgColorBottom: '#1e293b',
+    ambientLight: 'rgba(148, 163, 184, 0.2)',
+    gearSpeedMult: 1.9,
+    explosiveChance: 0.2,
+    smallGearChance: 0.5,
+    electricChance: 0.15,
+    lavaRiseSpeed: 40
+  },
+  {
+    zoneIndex: 10,
+    name: 'Zona 10: Tormenta de Metal',
+    subtitle: '¡La lluvia comienza a caer!',
+    startY: -85000,
+    endY: -110000,
+    bgColorTop: '#0f172a',
+    bgColorBottom: '#1e1b4b',
+    ambientLight: 'rgba(56, 189, 248, 0.1)',
+    gearSpeedMult: 2.0,
+    explosiveChance: 0.25,
+    smallGearChance: 0.6,
+    electricChance: 0.2,
+    lavaRiseSpeed: 45,
+    hasRain: true
+  },
+  {
+    zoneIndex: 11,
+    name: 'Zona 11: Cascadas de Aceite',
+    subtitle: '¡Cuidado! Todo está resbaladizo',
+    startY: -110000,
+    endY: -140000,
+    bgColorTop: '#1e1b4b',
+    bgColorBottom: '#020617',
+    ambientLight: 'rgba(99, 102, 241, 0.15)',
+    gearSpeedMult: 2.2,
+    explosiveChance: 0.3,
+    smallGearChance: 0.7,
+    electricChance: 0.25,
+    lavaRiseSpeed: 50,
+    hasRain: true,
+    isSlippery: true
+  },
+  {
+    zoneIndex: 12,
+    name: 'Zona 12: El Olvido Final',
+    subtitle: 'El desafío definitivo del maestro',
+    startY: -140000,
+    endY: -180000,
+    bgColorTop: '#000000',
+    bgColorBottom: '#020617',
+    ambientLight: 'rgba(239, 68, 68, 0.1)',
+    gearSpeedMult: 2.5,
+    explosiveChance: 0.4,
+    smallGearChance: 0.8,
+    electricChance: 0.3,
+    lavaRiseSpeed: 55,
+    hasRain: true,
+    isSlippery: true
   }
 ];
 
@@ -135,9 +245,9 @@ export function generateLevel(): { gears: Gear[]; collectibles: Collectible[] } 
   let currentY = startGear.y;
   let stepIdx = 0;
 
-  const totalGearsTarget = 240;
+  const totalGearsTarget = 1000;
 
-  while (gears.length < totalGearsTarget && currentY > -26000) {
+  while (gears.length < totalGearsTarget && currentY > -180000) {
     const zone = getZoneForY(currentY);
     const step = climbingSteps[stepIdx % climbingSteps.length];
     stepIdx++;
@@ -175,7 +285,9 @@ export function generateLevel(): { gears: Gear[]; collectibles: Collectible[] } 
       type = 'SMALL';
     }
 
-    if (zone.zoneIndex >= 4 && Math.random() < zone.explosiveChance) {
+    if (zone.zoneIndex >= 6 && Math.random() < 0.4) {
+      type = 'FROZEN';
+    } else if (zone.zoneIndex >= 4 && Math.random() < zone.explosiveChance) {
       type = 'EXPLOSIVE';
     } else if (zone.zoneIndex >= 3 && Math.random() < zone.electricChance) {
       type = 'ELECTRIC';
@@ -225,13 +337,21 @@ export function generateLevel(): { gears: Gear[]; collectibles: Collectible[] } 
     }
 
     // Powerups & special bonuses
-    if (Math.random() < 0.28) {
+    if (Math.random() < 0.32) {
       const roll = Math.random();
       let specialType: CollectibleType = 'DIAMOND';
-      if (roll < 0.28) specialType = 'HEART';
-      else if (roll < 0.48) specialType = 'MAGNET';
-      else if (roll < 0.68) specialType = 'CLOCK';
-      else if (roll < 0.88) specialType = 'STAR';
+      
+      if (zone.zoneIndex >= 8 && roll < 0.3) {
+        specialType = 'RUBY';
+      } else if (roll < 0.25) {
+        specialType = 'HEART';
+      } else if (roll < 0.45) {
+        specialType = 'MAGNET';
+      } else if (roll < 0.65) {
+        specialType = 'CLOCK';
+      } else if (roll < 0.85) {
+        specialType = 'STAR';
+      }
 
       collectibles.push({
         id: collectibleId++,

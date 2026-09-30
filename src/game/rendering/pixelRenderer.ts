@@ -97,6 +97,75 @@ export class PixelRenderer {
     // Ambient zone lighting overlay
     ctx.fillStyle = zone.ambientLight;
     ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+
+    // Snow particles for Zone 6 and 7
+    if (zone.zoneIndex === 6 || zone.zoneIndex === 7) {
+      this.renderSnow(cameraY);
+    }
+
+    // Star field for Zone 8
+    if (zone.zoneIndex >= 8) {
+      this.renderStars(cameraY);
+    }
+
+    // Rain for Zones 10, 11, 12
+    if (zone.hasRain) {
+      this.renderRain();
+    }
+  }
+
+  private renderRain() {
+    const ctx = this.ctx;
+    ctx.save();
+    const dropCount = 50;
+    const time = this.animTimer * 2;
+    
+    ctx.strokeStyle = 'rgba(186, 230, 253, 0.45)';
+    ctx.lineWidth = 1.5;
+    
+    for (let i = 0; i < dropCount; i++) {
+      const x = (i * 47.3 + time * 150) % VIEW_WIDTH;
+      const y = (i * 89.1 + time * 800) % VIEW_HEIGHT;
+      
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - 4, y + 12);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  private renderStars(cameraY: number) {
+    const ctx = this.ctx;
+    ctx.save();
+    const starCount = 60;
+    for (let i = 0; i < starCount; i++) {
+      const x = (i * 137.5) % VIEW_WIDTH;
+      const y = (i * 123.4 - cameraY * 0.2) % VIEW_HEIGHT;
+      const size = 1 + (i % 2);
+      const alpha = 0.4 + Math.sin(this.animTimer * 2 + i) * 0.3;
+      ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+      ctx.fillRect(x, y, size, size);
+    }
+    ctx.restore();
+  }
+
+  private renderSnow(cameraY: number) {
+    const ctx = this.ctx;
+    ctx.save();
+    const snowCount = 40;
+    const time = this.animTimer * 1.5;
+    
+    for (let i = 0; i < snowCount; i++) {
+      const x = (Math.sin(i * 123.45 + time) * 100 + i * 20) % VIEW_WIDTH;
+      const y = (i * 25 + time * 100 - cameraY * 0.5) % VIEW_HEIGHT;
+      
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.beginPath();
+      ctx.arc(x, y, 1.5 + Math.sin(i + time) * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
   }
 
   private renderSilhouetteGear(cx: number, cy: number, radius: number, angle: number) {
@@ -192,6 +261,11 @@ export class PixelRenderer {
       innerColor = '#27272a';
       toothColor = '#71717a';
       highlightColor = '#a1a1aa';
+    } else if (gear.type === 'FROZEN') {
+      outerColor = '#bae6fd';
+      innerColor = '#0c4a6e';
+      toothColor = '#f0f9ff';
+      highlightColor = '#ffffff';
     }
 
     // 1. Teeth drawing
@@ -297,17 +371,17 @@ export class PixelRenderer {
 
     // 7. Electric special effects
     if (gear.type === 'ELECTRIC') {
-      const sparkCount = 3;
+      const sparkCount = 5;
       ctx.strokeStyle = '#67e8f9';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 3;
       for (let s = 0; s < sparkCount; s++) {
         const sa = Math.random() * Math.PI * 2;
-        const sr1 = r * 0.7;
-        const sr2 = r + 8;
+        const sr1 = r * 0.6;
+        const sr2 = r + 15;
         ctx.beginPath();
         ctx.moveTo(Math.cos(sa) * sr1, Math.sin(sa) * sr1);
-        ctx.lineTo(Math.cos(sa + 0.2) * (sr1 + sr2) * 0.5, Math.sin(sa + 0.2) * (sr1 + sr2) * 0.5);
-        ctx.lineTo(Math.cos(sa - 0.1) * sr2, Math.sin(sa - 0.1) * sr2);
+        ctx.lineTo(Math.cos(sa + 0.25) * (sr1 + sr2) * 0.5, Math.sin(sa + 0.25) * (sr1 + sr2) * 0.5);
+        ctx.lineTo(Math.cos(sa - 0.15) * sr2, Math.sin(sa - 0.15) * sr2);
         ctx.stroke();
       }
     }
@@ -322,48 +396,49 @@ export class PixelRenderer {
       ctx.save();
       ctx.translate(gear.x, screenY);
       
+      // Larger bomb body
       ctx.fillStyle = '#18181b';
       ctx.beginPath();
-      ctx.arc(0, 0, 14, 0, Math.PI * 2);
+      ctx.arc(0, 0, 20, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 3;
       ctx.stroke();
 
       ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 3.5;
       ctx.beginPath();
-      ctx.moveTo(0, -14);
-      ctx.quadraticCurveTo(6, -22, 10, -26);
+      ctx.moveTo(0, -20);
+      ctx.quadraticCurveTo(8, -28, 12, -32);
       ctx.stroke();
 
       const sparkTime = this.animTimer * 20;
-      const sparkRadius = 3 + Math.sin(sparkTime) * 2;
+      const sparkRadius = 5 + Math.sin(sparkTime) * 3;
       ctx.fillStyle = (Math.floor(sparkTime) % 2 === 0) ? '#fef08a' : '#f97316';
       ctx.beginPath();
-      ctx.arc(10, -26, sparkRadius, 0, Math.PI * 2);
+      ctx.arc(12, -32, sparkRadius, 0, Math.PI * 2);
       ctx.fill();
 
       if (isArmed) {
         ctx.fillStyle = '#b91c1c';
-        ctx.fillRect(-18, -gear.radius - 24, 36, 18);
+        ctx.fillRect(-24, -gear.radius - 32, 48, 22);
         ctx.strokeStyle = '#fca5a5';
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(-18, -gear.radius - 24, 36, 18);
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-24, -gear.radius - 32, 48, 22);
 
-        ctx.font = 'bold 11px monospace';
+        ctx.font = 'bold 14px monospace';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(`${timer.toFixed(1)}s`, 0, -gear.radius - 15);
+        ctx.fillText(`${timer.toFixed(1)}s`, 0, -gear.radius - 21);
       } else {
-        ctx.fillStyle = 'rgba(0,0,0,0.7)';
-        ctx.fillRect(-14, -gear.radius - 18, 28, 14);
+        ctx.fillStyle = 'rgba(0,0,0,0.85)';
+        ctx.fillRect(-20, -gear.radius - 24, 40, 18);
         ctx.fillStyle = '#ef4444';
-        ctx.font = 'bold 9px sans-serif';
+        ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('💣 5s', 0, -gear.radius - 11);
+        ctx.fillText('💣 5s', 0, -gear.radius - 15);
       }
 
       ctx.restore();
@@ -383,7 +458,20 @@ export class PixelRenderer {
     ctx.save();
     ctx.translate(item.x, screenY);
 
-    const pulse = 1 + Math.sin(this.animTimer * 6 + item.floatOffset) * 0.12;
+    const baseScale = 1.6;
+    const pulse = baseScale + Math.sin(this.animTimer * 6 + item.floatOffset) * 0.15;
+
+    // GLOW EFFECT for Dopamine
+    const glowRadius = 25 * pulse;
+    const itemColor = this.getCollectibleColor(item.type);
+    const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, glowRadius);
+    glowGrad.addColorStop(0, itemColor.replace('1)', '0.4)'));
+    glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glowGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, glowRadius, 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.scale(pulse, pulse);
 
     switch (item.type) {
@@ -511,9 +599,50 @@ export class PixelRenderer {
         ctx.lineTo(4, 2);
         ctx.stroke();
         break;
+
+      case 'RUBY':
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.45)';
+        ctx.beginPath();
+        ctx.arc(0, 0, 18, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ef4444';
+        ctx.strokeStyle = '#7f1d1d';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, -12);
+        ctx.lineTo(10, -4);
+        ctx.lineTo(6, 12);
+        ctx.lineTo(-6, 12);
+        ctx.lineTo(-10, -4);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Shiny reflection
+        ctx.fillStyle = '#fca5a5';
+        ctx.beginPath();
+        ctx.moveTo(-4, -6);
+        ctx.lineTo(0, -9);
+        ctx.lineTo(4, -6);
+        ctx.fill();
+        break;
     }
 
     ctx.restore();
+  }
+
+  private getCollectibleColor(type: string): string {
+    switch (type) {
+      case 'LIGHTNING': return 'rgba(250, 204, 21, 1)';
+      case 'HEART': return 'rgba(239, 68, 68, 1)';
+      case 'DIAMOND': return 'rgba(56, 189, 248, 1)';
+      case 'STAR': return 'rgba(234, 179, 8, 1)';
+      case 'MAGNET': return 'rgba(239, 68, 68, 1)';
+      case 'CLOCK': return 'rgba(245, 158, 11, 1)';
+      case 'RUBY': return 'rgba(239, 68, 68, 1)';
+      default: return 'rgba(255, 255, 255, 1)';
+    }
   }
 
   // --- RENDER PLAYER SPRITE ---
@@ -776,11 +905,36 @@ export class PixelRenderer {
         ctx.fillRect(p.x - p.size / 2, screenY - p.size / 2, p.size, p.size);
       } else if (p.type === 'debris') {
         ctx.fillRect(p.x - p.size / 2, screenY - p.size / 2, p.size, p.size);
+      } else if (p.type === 'flare') {
+        ctx.beginPath();
+        ctx.arc(p.x, screenY, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        // Inner white core
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(p.x, screenY, p.size * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (p.type === 'shockwave') {
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 3 * alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, screenY, p.size * (1 - alpha), 0, Math.PI * 2);
+        ctx.stroke();
       } else {
         ctx.fillRect(p.x - p.size / 2, screenY - p.size / 2, p.size, p.size);
       }
       ctx.restore();
     }
+  }
+
+  public renderFlash(alpha: number) {
+    if (alpha <= 0) return;
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+    ctx.restore();
   }
 
   // --- RENDER FLOATING TEXTS ---
@@ -792,14 +946,16 @@ export class PixelRenderer {
       if (screenY < -50 || screenY > VIEW_HEIGHT + 50) continue;
 
       ctx.save();
+      ctx.translate(t.x, screenY);
+      ctx.scale(t.scale, t.scale);
       ctx.globalAlpha = Math.max(0, Math.min(1, t.alpha));
       ctx.font = 'bold 16px "Chakra Petch", monospace';
       ctx.textAlign = 'center';
       ctx.fillStyle = t.color;
       ctx.strokeStyle = '#000000';
       ctx.lineWidth = 3;
-      ctx.strokeText(t.text, t.x, screenY);
-      ctx.fillText(t.text, t.x, screenY);
+      ctx.strokeText(t.text, 0, 0);
+      ctx.fillText(t.text, 0, 0);
       ctx.restore();
     }
   }

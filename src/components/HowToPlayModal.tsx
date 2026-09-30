@@ -145,6 +145,14 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
                 </div>
               </div>
 
+              <div className="bg-stone-950/80 p-2.5 rounded-xl border border-blue-400/60 flex items-center gap-3">
+                <span className="text-2xl">❄️</span>
+                <div>
+                  <h4 className="font-bold text-blue-300 font-chakra">Engranaje Congelado</h4>
+                  <p className="text-[11px] text-stone-400">¡Resbaladizo! Gira un 20% más rápido que los normales.</p>
+                </div>
+              </div>
+
               <div className="bg-stone-950/80 p-2.5 rounded-xl border border-stone-800 flex items-center gap-3">
                 <span className="text-2xl">⚡</span>
                 <div>
@@ -156,18 +164,34 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
               <div className="bg-stone-950/80 p-2.5 rounded-xl border border-red-800/80 flex items-center gap-3">
                 <span className="text-2xl">💣</span>
                 <div>
-                  <h4 className="font-bold text-red-400 font-chakra">Engranaje Explosivo (5 Segundos)</h4>
+                  <h4 className="font-bold text-red-400 font-chakra uppercase">Engranaje Bomba (Daño: -0.5 ❤️)</h4>
                   <p className="text-[11px] text-stone-300">
-                    Al aterrizar sobre él, <strong className="text-red-400">inicia una cuenta regresiva de 5 segundos</strong>. ¡Salta antes de que detone!
+                    Al aterrizar, inicia una cuenta de 5s. ¡Salta antes de que detone o recibirás daño!
                   </p>
                 </div>
               </div>
 
-              <div className="bg-stone-950/80 p-2.5 rounded-xl border border-stone-800 flex items-center gap-3">
-                <span className="text-2xl">🔘</span>
+              <div className="bg-stone-950/80 p-2.5 rounded-xl border border-blue-400/60 flex items-center gap-3">
+                <span className="text-2xl">🌧️</span>
                 <div>
-                  <h4 className="font-bold text-stone-300 font-chakra">Engranajes Grandes & Pequeños</h4>
-                  <p className="text-[11px] text-stone-400">Los grandes ofrecen aterrizaje fácil; los pequeños exigen precisión milimétrica.</p>
+                  <h4 className="font-bold text-blue-300 font-chakra uppercase">Lluvia y Aceite</h4>
+                  <p className="text-[11px] text-stone-300">En zonas altas, la lluvia hace que te resbales hacia abajo si no saltas rápido.</p>
+                </div>
+              </div>
+
+              <div className="bg-stone-950/80 p-2.5 rounded-xl border border-cyan-400/60 flex items-center gap-3">
+                <span className="text-2xl">⚡</span>
+                <div>
+                  <h4 className="font-bold text-cyan-300 font-chakra uppercase">Alto Voltaje (Daño: -0.5 ❤️)</h4>
+                  <p className="text-[11px] text-stone-300">Las chispas azules te electrocutan. ¡Calcula bien tu salto!</p>
+                </div>
+              </div>
+
+              <div className="bg-red-950/40 p-2.5 rounded-xl border border-red-600/60 flex items-center gap-3">
+                <span className="text-2xl">🔥</span>
+                <div>
+                  <h4 className="font-bold text-red-500 font-chakra uppercase">Lava (Daño: -0.5 ❤️)</h4>
+                  <p className="text-[11px] text-stone-300">Si la lava te alcanza, pierdes vida y regresas al último punto seguro.</p>
                 </div>
               </div>
             </div>
@@ -178,16 +202,16 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
               <div className="bg-stone-950/80 p-2.5 rounded-xl border border-amber-500/40 flex items-center gap-3">
                 <span className="text-2xl">⚡</span>
                 <div>
-                  <h4 className="font-bold text-amber-300 font-chakra">Rayo de Energía (+25 pts)</h4>
-                  <p className="text-[11px] text-stone-400">El coleccionable principal flotando entre engranajes.</p>
+                  <h4 className="font-bold text-amber-300 font-chakra">Rayo de Energía (+10 pts)</h4>
+                  <p className="text-[11px] text-stone-400">Coleccionable básico repartido por toda la fábrica.</p>
                 </div>
               </div>
 
               <div className="bg-stone-950/80 p-2.5 rounded-xl border border-red-500/40 flex items-center gap-3">
                 <span className="text-2xl">❤️</span>
                 <div>
-                  <h4 className="font-bold text-red-400 font-chakra">Corazón (+0.5 ❤️)</h4>
-                  <p className="text-[11px] text-stone-400">Restaura medio corazón de vida.</p>
+                  <h4 className="font-bold text-red-400 font-chakra">Corazón Vital (+1 ❤️ Completo)</h4>
+                  <p className="text-[11px] text-stone-400">Restaura 1 corazón de salud (2 medios corazones).</p>
                 </div>
               </div>
 
@@ -220,6 +244,14 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
                 <div>
                   <h4 className="font-bold text-amber-300 font-chakra">Reloj (Slow Motion)</h4>
                   <p className="text-[11px] text-stone-400">Ralentiza las trampas y engranajes peligrosos por 8s.</p>
+                </div>
+              </div>
+
+              <div className="bg-stone-950/80 p-2.5 rounded-xl border border-red-600/60 flex items-center gap-3">
+                <span className="text-2xl">🧧</span>
+                <div>
+                  <h4 className="font-bold text-red-500 font-chakra">Rubí Legendario (+250 pts)</h4>
+                  <p className="text-[11px] text-stone-400">Solo aparece en las zonas finales más peligrosas.</p>
                 </div>
               </div>
             </div>

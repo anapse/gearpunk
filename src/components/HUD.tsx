@@ -4,9 +4,10 @@
  * Clean, minimal interface without on-screen buttons (Pure touch/mouse gesture control)
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { GameScoreState } from '../game/types';
 import { Pause, ArrowUpCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface HUDProps {
   scoreState: GameScoreState;
@@ -14,6 +15,17 @@ interface HUDProps {
 }
 
 export const HUD: React.FC<HUDProps> = ({ scoreState, onPause }) => {
+  const [prevScore, setPrevScore] = useState(0);
+  const [prevHeight, setPrevHeight] = useState(0);
+
+  useEffect(() => {
+    setPrevScore(scoreState.score);
+  }, [scoreState.score]);
+
+  useEffect(() => {
+    setPrevHeight(scoreState.height);
+  }, [scoreState.height]);
+
   // Render 3 hearts from scoreState.hearts (0 to 6 half-hearts)
   const renderHearts = () => {
     const hearts = [];
@@ -22,9 +34,15 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause }) => {
       if (heartValue >= 2) {
         // Full heart ❤️
         hearts.push(
-          <span key={i} className="text-red-500 drop-shadow-[0_0_6px_rgba(239,68,68,0.9)] text-lg md:text-xl animate-pulse">
+          <motion.span 
+            key={i} 
+            initial={{ scale: 1 }}
+            animate={{ scale: [1, 1.3, 1] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            className="text-red-500 drop-shadow-[0_0_6px_rgba(239,68,68,0.9)] text-lg md:text-xl"
+          >
             ❤️
-          </span>
+          </motion.span>
         );
       } else if (heartValue === 1) {
         // Half heart 💔
@@ -58,30 +76,42 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause }) => {
         </div>
 
         {/* Counter of times climbed */}
-        <div className="bg-stone-900/95 border border-emerald-600/80 rounded-xl px-2.5 py-0.5 flex flex-col items-center shadow-lg backdrop-blur-md">
+        <motion.div 
+          key={scoreState.jumpsCount}
+          animate={{ scale: [1, 1.2, 1] }}
+          className="bg-stone-900/95 border border-emerald-600/80 rounded-xl px-2.5 py-0.5 flex flex-col items-center shadow-lg backdrop-blur-md"
+        >
           <span className="text-[8px] uppercase font-bold tracking-wider text-emerald-400 font-pixel flex items-center gap-0.5">
             <ArrowUpCircle className="w-2.5 h-2.5" /> SUBIDAS
           </span>
           <span className="text-sm font-black text-emerald-300 font-chakra leading-tight">
             {scoreState.jumpsCount}
           </span>
-        </div>
+        </motion.div>
 
         {/* Score Panel */}
-        <div className="bg-stone-900/95 border border-amber-600/80 rounded-xl px-2.5 py-0.5 flex flex-col items-center shadow-lg backdrop-blur-md">
+        <motion.div 
+          key={scoreState.score}
+          animate={{ scale: [1, 1.3, 1] }}
+          className="bg-stone-900/95 border border-amber-600/80 rounded-xl px-2.5 py-0.5 flex flex-col items-center shadow-lg backdrop-blur-md"
+        >
           <span className="text-[8px] uppercase font-bold tracking-wider text-amber-400 font-pixel">PUNTAJE</span>
           <span className="text-sm font-black text-amber-300 font-chakra leading-tight">
             {scoreState.score.toLocaleString()}
           </span>
-        </div>
+        </motion.div>
 
         {/* Height Panel */}
-        <div className="bg-stone-900/95 border border-cyan-600/80 rounded-xl px-2.5 py-0.5 flex flex-col items-center shadow-lg backdrop-blur-md">
+        <motion.div 
+          key={scoreState.height}
+          animate={{ scale: [1, 1.2, 1] }}
+          className="bg-stone-900/95 border border-cyan-600/80 rounded-xl px-2.5 py-0.5 flex flex-col items-center shadow-lg backdrop-blur-md"
+        >
           <span className="text-[8px] uppercase font-bold tracking-wider text-cyan-400 font-pixel">ALTURA</span>
           <span className="text-sm font-black text-cyan-300 font-chakra leading-tight">
             {scoreState.height}m
           </span>
-        </div>
+        </motion.div>
 
         {/* Pause Button */}
         <button
@@ -95,18 +125,30 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause }) => {
 
       {/* Active Powerup Badges */}
       <div className="flex items-center gap-2 px-1">
-        {scoreState.activeMagnetTimer > 0 && (
-          <div className="bg-sky-950/90 border border-sky-400 text-sky-200 text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md animate-bounce">
-            <span>🧲 IMÁN</span>
-            <span className="font-bold">{scoreState.activeMagnetTimer.toFixed(1)}s</span>
-          </div>
-        )}
-        {scoreState.activeSlowMoTimer > 0 && (
-          <div className="bg-amber-950/90 border border-amber-400 text-amber-200 text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md animate-pulse">
-            <span>⏱ RELOJ</span>
-            <span className="font-bold">{scoreState.activeSlowMoTimer.toFixed(1)}s</span>
-          </div>
-        )}
+        <AnimatePresence>
+          {scoreState.activeMagnetTimer > 0 && (
+            <motion.div 
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -20, opacity: 0 }}
+              className="bg-sky-950/90 border border-sky-400 text-sky-200 text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md"
+            >
+              <motion.span animate={{ rotate: [0, 10, -10, 0] }} transition={{ repeat: Infinity, duration: 1 }}>🧲 IMÁN</motion.span>
+              <span className="font-bold">{scoreState.activeMagnetTimer.toFixed(1)}s</span>
+            </motion.div>
+          )}
+          {scoreState.activeSlowMoTimer > 0 && (
+            <motion.div 
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -20, opacity: 0 }}
+              className="bg-amber-950/90 border border-amber-400 text-amber-200 text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md"
+            >
+              <motion.span animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 1 }}>⏱ RELOJ</motion.span>
+              <span className="font-bold">{scoreState.activeSlowMoTimer.toFixed(1)}s</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -41,14 +41,14 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
             ¡VICTORIA TOTAL!
           </h2>
           <span className="text-xs text-amber-300 font-pixel">
-            ¡HAS CONQUISTADO LAS 5 ZONAS!
+            ¡HAS CONQUISTADO LAS 12 ZONAS!
           </span>
         </div>
 
         {/* Content */}
         <div className="p-5 space-y-4">
           <p className="text-xs text-stone-300 text-center leading-relaxed">
-            Has escalado toda la fábrica industrial superando los engranajes explosivos, trampas de alto voltaje y el infierno de lava.
+            Eres un auténtico maestro. Has superado tormentas eléctricas, lluvia torrencial y superficies resbaladizas hasta alcanzar la cima del mundo.
           </p>
 
           <div className="grid grid-cols-2 gap-3">

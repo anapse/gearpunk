@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Play, BookOpen, Trophy, Volume2, VolumeX, Heart } from 'lucide-react';
+import { Play, BookOpen, Trophy, Volume2, VolumeX, Mail } from 'lucide-react';
 import { soundManager } from '../game/audio/soundManager';
 import { logoImg } from '../assets';
 
@@ -13,7 +13,7 @@ interface MenuScreenProps {
   onPlay: () => void;
   onHowToPlay: () => void;
   onHighScore: () => void;
-  onTribute: () => void;
+  onContact: () => void;
   isMuted: boolean;
   onToggleMute: () => void;
 }
@@ -22,23 +22,23 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({
   onPlay,
   onHowToPlay,
   onHighScore,
-  onTribute,
+  onContact,
   isMuted,
   onToggleMute
 }) => {
   return (
     <div className="absolute inset-0 z-30 flex flex-col items-center justify-between p-3.5 bg-gradient-to-b from-stone-950/90 via-stone-900/80 to-amber-950/90 backdrop-blur-[2px] select-none">
-      {/* Top Bar with Audio & Tribute */}
+      {/* Top Bar with Audio */}
       <div className="w-full flex items-center justify-between z-10 px-1">
         <button
           onClick={() => {
             soundManager.playButtonClick();
-            onTribute();
+            onContact();
           }}
-          className="flex items-center gap-1 bg-stone-900/90 hover:bg-stone-800 border border-amber-600/70 text-amber-300 text-[11px] px-2.5 py-1 rounded-lg shadow transition-transform active:scale-95 cursor-pointer"
+          className="bg-stone-900/90 hover:bg-stone-800 border border-stone-700 text-stone-300 px-2.5 py-1.5 rounded-lg shadow transition-transform active:scale-95 cursor-pointer flex items-center gap-1.5"
         >
-          <Heart className="w-3.5 h-3.5 text-red-400 fill-red-500/40 animate-pulse" />
-          <span className="font-chakra font-bold tracking-wide">HOMENAJE</span>
+          <Mail className="w-3.5 h-3.5 text-amber-500" />
+          <span className="text-[10px] font-bold font-chakra tracking-wider">CONTÁCTANOS</span>
         </button>
 
         <button

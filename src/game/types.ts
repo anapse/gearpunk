@@ -35,7 +35,8 @@ export type GearType =
   | 'FAST'            // Fast spinning gear
   | 'STATIC'          // Non-rotating platform
   | 'ELECTRIC'        // Electric sparks / hazard
-  | 'EXPLOSIVE';      // 5-second countdown bomb
+  | 'EXPLOSIVE'       // 5-second countdown bomb
+  | 'FROZEN';         // Slippery frozen gear
 
 export interface Gear {
   id: number;
@@ -63,7 +64,8 @@ export type CollectibleType =
   | 'DIAMOND'     // +50 pts
   | 'STAR'        // +100 pts
   | 'MAGNET'      // Attracts rays for 10s
-  | 'CLOCK';      // Slow-motion for 8s
+  | 'CLOCK'       // Slow-motion for 8s
+  | 'RUBY';        // +250 pts (Final Zone Only)
 
 export interface Collectible {
   id: number;
@@ -89,7 +91,7 @@ export interface Particle {
   maxLife: number;
   gravity?: number;
   alpha?: number;
-  type?: 'spark' | 'smoke' | 'fire' | 'bubble' | 'debris' | 'star';
+  type?: 'spark' | 'smoke' | 'fire' | 'bubble' | 'debris' | 'star' | 'flare' | 'shockwave';
 }
 
 export interface FloatingText {
@@ -118,6 +120,8 @@ export interface ZoneConfig {
   smallGearChance: number;
   electricChance: number;
   lavaRiseSpeed: number;
+  isSlippery?: boolean;
+  hasRain?: boolean;
 }
 
 export interface GameScoreState {
