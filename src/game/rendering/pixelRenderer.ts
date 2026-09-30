@@ -98,12 +98,12 @@ export class PixelRenderer {
     ctx.fillStyle = zone.ambientLight;
     ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
 
-    // Snow particles for Zone 6 and 7
-    if (zone.zoneIndex === 6 || zone.zoneIndex === 7) {
+    // Snow particles for Zone 7 and 8 (High Peaks)
+    if (zone.zoneIndex === 7 || zone.zoneIndex === 8) {
       this.renderSnow(cameraY);
     }
 
-    // Star field for Zone 8
+    // Star field for Zone 8, 9, 10, 11, 12 (Atmosphere & Space)
     if (zone.zoneIndex >= 8) {
       this.renderStars(cameraY);
     }
