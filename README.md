@@ -51,4 +51,4 @@ npm run build
 
 Este proyecto es propiedad intelectual privada. **No se permite la copia, redistribución o uso comercial** del código fuente, activos visuales o mecánicas de juego sin el permiso explícito de los autores.
 
-Dedicado con orgullo a **Violenti**.
+Dedicado con orgullo a **Violenty**.
