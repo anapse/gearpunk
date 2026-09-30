@@ -1,0 +1,37 @@
+{
+  "entities": {
+    "LeaderboardEntry": {
+      "title": "LeaderboardEntry",
+      "description": "High score leaderboard entry for Top 50 players in Gear Rush",
+      "type": "object",
+      "properties": {
+        "playerName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20,
+          "description": "Display name of the player"
+        },
+        "score": {
+          "type": "integer",
+          "description": "Total score achieved"
+        },
+        "height": {
+          "type": "integer",
+          "description": "Max height climbed in meters"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the score was recorded"
+        }
+      },
+      "required": ["playerName", "score", "height", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/leaderboard/{entryId}": {
+      "schema": "LeaderboardEntry",
+      "description": "Top 50 high scores across all players"
+    }
+  }
+}

@@ -15,6 +15,7 @@ import { GameOverModal } from './components/GameOverModal';
 import { VictoryModal } from './components/VictoryModal';
 import { PauseModal } from './components/PauseModal';
 import { ContactModal } from './components/ContactModal';
+import { LeaderboardModal } from './components/LeaderboardModal';
 
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -39,6 +40,7 @@ export default function App() {
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showHighScore, setShowHighScore] = useState(false);
   const [showContact, setShowContact] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
   // Initialize Canvas & Game Engine
@@ -160,6 +162,7 @@ export default function App() {
               soundManager.playButtonClick();
               engineRef.current?.pauseGame();
             }}
+            onShowLeaderboard={() => setShowLeaderboard(true)}
           />
         )}
 
@@ -169,6 +172,7 @@ export default function App() {
             onPlay={() => engineRef.current?.startGame()}
             onHowToPlay={() => setShowHowToPlay(true)}
             onHighScore={() => setShowHighScore(true)}
+            onLeaderboard={() => setShowLeaderboard(true)}
             onContact={() => setShowContact(true)}
             isMuted={isMuted}
             onToggleMute={toggleMute}
@@ -195,6 +199,7 @@ export default function App() {
             isNewRecord={engineRef.current?.isNewRecord || false}
             onPlayAgain={() => engineRef.current?.startGame()}
             onMenu={() => engineRef.current?.goToMenu()}
+            onShowLeaderboard={() => setShowLeaderboard(true)}
           />
         )}
 
@@ -226,6 +231,14 @@ export default function App() {
         {/* Contact Modal */}
         {showContact && (
           <ContactModal onClose={() => setShowContact(false)} />
+        )}
+
+        {/* Top 50 Leaderboard Modal */}
+        {showLeaderboard && (
+          <LeaderboardModal
+            currentScore={scoreState.score}
+            onClose={() => setShowLeaderboard(false)}
+          />
         )}
       </div>
     </main>

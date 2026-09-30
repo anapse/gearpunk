@@ -1,7 +1,6 @@
 /**
  * GEAR RUSH - Menu Screen
- * Dedicado a Violenti
- * Clean, compact arcade layout with official emblem logo
+ * Clean, compact arcade layout with official emblem logo, Top 50 Leaderboard & contact options
  */
 
 import React from 'react';
@@ -13,6 +12,7 @@ interface MenuScreenProps {
   onPlay: () => void;
   onHowToPlay: () => void;
   onHighScore: () => void;
+  onLeaderboard: () => void;
   onContact: () => void;
   isMuted: boolean;
   onToggleMute: () => void;
@@ -22,13 +22,14 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({
   onPlay,
   onHowToPlay,
   onHighScore,
+  onLeaderboard,
   onContact,
   isMuted,
   onToggleMute
 }) => {
   return (
     <div className="absolute inset-0 z-30 flex flex-col items-center justify-between p-3.5 bg-gradient-to-b from-stone-950/90 via-stone-900/80 to-amber-950/90 backdrop-blur-[2px] select-none">
-      {/* Top Bar with Audio */}
+      {/* Top Bar with Audio & Contact */}
       <div className="w-full flex items-center justify-between z-10 px-1">
         <button
           onClick={() => {
@@ -57,7 +58,7 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({
       <div className="flex flex-col items-center text-center my-auto z-10 max-w-[280px]">
         {/* Official GEAR RUSH Emblem Logo */}
         <div className="relative mb-2 flex items-center justify-center">
-          <div className="w-36 h-36 md:w-44 md:h-44 rounded-full border-2 border-amber-500/80 bg-stone-950/90 flex items-center justify-center shadow-[0_0_30px_rgba(249,115,22,0.6)] overflow-hidden p-1">
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-2 border-amber-500/80 bg-stone-950/90 flex items-center justify-center shadow-[0_0_30px_rgba(249,115,22,0.6)] overflow-hidden p-1">
             <img
               src={logoImg}
               alt="GEAR RUSH Logo"
@@ -73,7 +74,7 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({
       </div>
 
       {/* Main Action Buttons */}
-      <div className="w-full max-w-[230px] flex flex-col gap-2.5 mb-2 z-10">
+      <div className="w-full max-w-[230px] flex flex-col gap-2 mb-2 z-10">
         {/* PLAY BUTTON */}
         <button
           onClick={() => {
@@ -84,6 +85,18 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({
         >
           <Play className="w-5 h-5 fill-current" />
           <span>JUGAR</span>
+        </button>
+
+        {/* TOP 50 LEADERBOARD BUTTON */}
+        <button
+          onClick={() => {
+            soundManager.playButtonClick();
+            onLeaderboard();
+          }}
+          className="bg-gradient-to-r from-amber-600 to-amber-800 hover:from-amber-500 hover:to-amber-700 border border-amber-400 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-xs font-black font-chakra tracking-wide shadow-md transition-transform active:scale-95 cursor-pointer"
+        >
+          <Trophy className="w-4 h-4 text-amber-200" />
+          <span>TOP 50 JUGADORES</span>
         </button>
 
         {/* HOW TO PLAY BUTTON */}
@@ -104,10 +117,10 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({
             soundManager.playButtonClick();
             onHighScore();
           }}
-          className="gear-btn gear-btn-purple py-2 px-4 rounded-xl flex items-center justify-center gap-2 text-xs font-black font-chakra tracking-wide cursor-pointer"
+          className="gear-btn gear-btn-purple py-1.5 px-4 rounded-xl flex items-center justify-center gap-2 text-[11px] font-bold font-chakra tracking-wide cursor-pointer"
         >
-          <Trophy className="w-4 h-4 text-amber-300" />
-          <span>MAYOR PUNTAJE</span>
+          <Trophy className="w-3.5 h-3.5 text-amber-300" />
+          <span>MI RÉCORD LOCAL</span>
         </button>
       </div>
 
