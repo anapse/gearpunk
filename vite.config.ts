@@ -3,8 +3,11 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+export default defineConfig(({ command }) => {
   return {
+    // GitHub Pages serves this repository under /gearpunk/.
+    // Local development remains at /.
+    base: command === 'build' ? '/gearpunk/' : '/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
