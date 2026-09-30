@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Chakra Petch', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    background-color: #0c0a09;
+    color: #f5f5f4;
+  }
+}
+
+.font-pixel {
+  font-family: 'Press Start 2P', monospace;
+}
+
+.font-chakra {
+  font-family: 'Chakra Petch', sans-serif;
+}
+
+.font-teko {
+  font-family: 'Teko', sans-serif;
+}
+
+/* Crisp pixel rendering */
+canvas {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Steampunk glowing text & border effects */
+.text-shadow-fire {
+  text-shadow: 0 0 10px rgba(249, 115, 22, 0.8), 0 0 20px rgba(239, 68, 68, 0.6), 2px 2px 0px #000;
+}
+
+.text-shadow-metal {
+  text-shadow: 2px 2px 0px #000, -1px -1px 0px #333, 1px 1px 4px rgba(0,0,0,0.8);
+}
+
+.text-shadow-gold {
+  text-shadow: 0 0 8px rgba(234, 179, 8, 0.8), 2px 2px 0px #000;
+}
+
+.box-shadow-fire {
+  box-shadow: 0 0 15px rgba(249, 115, 22, 0.4), inset 0 0 10px rgba(249, 115, 22, 0.2);
+}
+
+.box-shadow-metal {
+  box-shadow: 0 6px 0px #1c1917, 0 10px 20px rgba(0, 0, 0, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.box-shadow-metal-active {
+  box-shadow: 0 2px 0px #1c1917, 0 4px 10px rgba(0, 0, 0, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(4px);
+}
+
+/* Custom button styles */
+.gear-btn {
+  position: relative;
+  transition: all 0.1s ease-in-out;
+  border: 2px solid #57534e;
+  background: linear-gradient(180deg, #44403c 0%, #292524 100%);
+  color: #f5f5f4;
+  text-transform: uppercase;
+  font-weight: 700;
+  box-shadow: 0 4px 0 #1c1917, 0 6px 12px rgba(0,0,0,0.5);
+}
+
+.gear-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #1c1917, 0 3px 6px rgba(0,0,0,0.5);
+}
+
+.gear-btn-green {
+  border-color: #22c55e;
+  background: linear-gradient(180deg, #16a34a 0%, #15803d 50%, #166534 100%);
+  box-shadow: 0 4px 0 #14532d, 0 8px 16px rgba(22, 163, 74, 0.4);
+}
+
+.gear-btn-blue {
+  border-color: #38bdf8;
+  background: linear-gradient(180deg, #0284c7 0%, #0369a1 50%, #075985 100%);
+  box-shadow: 0 4px 0 #0c4a6e, 0 8px 16px rgba(2, 132, 199, 0.4);
+}
+
+.gear-btn-purple {
+  border-color: #a855f7;
+  background: linear-gradient(180deg, #7e22ce 0%, #6b21a8 50%, #581c87 100%);
+  box-shadow: 0 4px 0 #3b0764, 0 8px 16px rgba(126, 34, 206, 0.4);
+}
+
+.gear-btn-orange {
+  border-color: #f97316;
+  background: linear-gradient(180deg, #ea580c 0%, #c2410c 50%, #9a3412 100%);
+  box-shadow: 0 4px 0 #7c2d12, 0 8px 16px rgba(234, 88, 12, 0.4);
+}
+

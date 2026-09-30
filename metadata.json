@@ -1,0 +1,6 @@
+{
+  "name": "GEAR RUSH",
+  "description": "GEAR RUSH - Dedicado a Violenti. Videojuego arcade vertical de plataformas y engranajes giratorios con estilo pixel art steampunk.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
