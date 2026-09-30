@@ -955,7 +955,7 @@ export class GameEngine {
       this.notifyUI();
     }
 
-    const milestones = [50, 100, 250, 500, 1000, 1500];
+    const milestones = [100, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000];
     for (const m of milestones) {
       if (this.scoreState.height >= m && !this.milestoneFlags.has(m)) {
         this.milestoneFlags.add(m);

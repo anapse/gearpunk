@@ -11,8 +11,8 @@ export const ZONES: ZoneConfig[] = [
     zoneIndex: 1,
     name: 'Zona 1: Fábrica Inferior',
     subtitle: 'Aprende los saltos, el agarre y el rebote en pared',
-    startY: 0,
-    endY: -5000,
+    startY: 1000,
+    endY: -10000, // 0m - 500m
     bgColorTop: '#1e110a',
     bgColorBottom: '#381608',
     ambientLight: 'rgba(249, 115, 22, 0.15)',
@@ -20,74 +20,74 @@ export const ZONES: ZoneConfig[] = [
     explosiveChance: 0.0,
     smallGearChance: 0.1,
     electricChance: 0.0,
-    lavaRiseSpeed: 13
+    lavaRiseSpeed: 12
   },
   {
     zoneIndex: 2,
     name: 'Zona 2: Maquinaria Pesada',
     subtitle: 'Cambios de giro y engranajes rápidos',
-    startY: -5000,
-    endY: -10000,
+    startY: -10000,
+    endY: -24000, // 500m - 1200m
     bgColorTop: '#14121a',
     bgColorBottom: '#261b17',
     ambientLight: 'rgba(234, 179, 8, 0.12)',
     gearSpeedMult: 0.8,
-    explosiveChance: 0.08,
+    explosiveChance: 0.05,
     smallGearChance: 0.2,
     electricChance: 0.0,
-    lavaRiseSpeed: 16
+    lavaRiseSpeed: 15
   },
   {
     zoneIndex: 3,
     name: 'Zona 3: Zona Eléctrica',
     subtitle: 'Engranajes electrificados y sobrecarga',
-    startY: -10000,
-    endY: -17500,
+    startY: -24000,
+    endY: -40000, // 1200m - 2000m
     bgColorTop: '#081726',
     bgColorBottom: '#0e1f33',
     ambientLight: 'rgba(56, 189, 248, 0.18)',
     gearSpeedMult: 0.95,
-    explosiveChance: 0.12,
+    explosiveChance: 0.1,
     smallGearChance: 0.25,
-    electricChance: 0.25,
-    lavaRiseSpeed: 19
+    electricChance: 0.2,
+    lavaRiseSpeed: 18
   },
   {
     zoneIndex: 4,
     name: 'Zona 4: Torre Superior',
     subtitle: 'Engranajes explosivos con mecha de 5s',
-    startY: -17500,
-    endY: -25000,
+    startY: -40000,
+    endY: -60000, // 2000m - 3000m
     bgColorTop: '#1f0d1a',
     bgColorBottom: '#2d1424',
     ambientLight: 'rgba(236, 72, 153, 0.15)',
     gearSpeedMult: 1.1,
-    explosiveChance: 0.25,
+    explosiveChance: 0.22,
     smallGearChance: 0.3,
-    electricChance: 0.2,
-    lavaRiseSpeed: 22
+    electricChance: 0.18,
+    lavaRiseSpeed: 21
   },
   {
     zoneIndex: 5,
     name: 'Zona 5: Caldera Extrema',
     subtitle: 'Calor intenso y engranajes veloces',
-    startY: -25000,
-    endY: -32500,
+    startY: -60000,
+    endY: -80000, // 3000m - 4000m
     bgColorTop: '#2a0505',
     bgColorBottom: '#450a0a',
     ambientLight: 'rgba(239, 68, 68, 0.25)',
     gearSpeedMult: 1.25,
-    explosiveChance: 0.3,
+    explosiveChance: 0.25,
     smallGearChance: 0.35,
-    electricChance: 0.25,
-    lavaRiseSpeed: 25
+    electricChance: 0.2,
+    lavaRiseSpeed: 24
   },
   {
     zoneIndex: 6,
     name: 'Zona 6: Abismo de Vapor',
     subtitle: 'Vapor cegador y ascenso continuo',
-    startY: -32500,
-    endY: -40000,
+    startY: -80000,
+    endY: -96000, // 4000m - 4800m
     bgColorTop: '#334155',
     bgColorBottom: '#1e293b',
     ambientLight: 'rgba(148, 163, 184, 0.2)',
@@ -95,14 +95,14 @@ export const ZONES: ZoneConfig[] = [
     explosiveChance: 0.2,
     smallGearChance: 0.4,
     electricChance: 0.15,
-    lavaRiseSpeed: 28
+    lavaRiseSpeed: 27
   },
   {
     zoneIndex: 7,
     name: 'Zona 7: Cumbres Nevadas',
     subtitle: 'Engranajes congelados y vientos gélidos',
-    startY: -40000,
-    endY: -50000,
+    startY: -96000,
+    endY: -112000, // 4800m - 5600m
     bgColorTop: '#e0f2fe',
     bgColorBottom: '#7dd3fc',
     ambientLight: 'rgba(186, 230, 253, 0.2)',
@@ -110,68 +110,68 @@ export const ZONES: ZoneConfig[] = [
     explosiveChance: 0.15,
     smallGearChance: 0.45,
     electricChance: 0.1,
-    lavaRiseSpeed: 32
+    lavaRiseSpeed: 30
   },
   {
     zoneIndex: 8,
     name: 'Zona 8: Cúspide de Cristal',
     subtitle: 'El límite del mundo, el cielo se abre',
-    startY: -50000,
-    endY: -60000,
+    startY: -112000,
+    endY: -128000, // 5600m - 6400m
     bgColorTop: '#f8fafc',
     bgColorBottom: '#bae6fd',
     ambientLight: 'rgba(255, 255, 255, 0.3)',
-    gearSpeedMult: 1.7,
+    gearSpeedMult: 1.65,
     explosiveChance: 0.2,
     smallGearChance: 0.5,
     electricChance: 0.15,
-    lavaRiseSpeed: 35
+    lavaRiseSpeed: 33
   },
   {
     zoneIndex: 9,
     name: 'Zona 9: Núcleo Estelar',
     subtitle: 'El ascenso entre las estrellas',
-    startY: -60000,
-    endY: -70000,
+    startY: -128000,
+    endY: -144000, // 6400m - 7200m
     bgColorTop: '#020617',
     bgColorBottom: '#1e1b4b',
     ambientLight: 'rgba(99, 102, 241, 0.15)',
-    gearSpeedMult: 1.9,
+    gearSpeedMult: 1.8,
     explosiveChance: 0.25,
-    smallGearChance: 0.6,
+    smallGearChance: 0.55,
     electricChance: 0.2,
-    lavaRiseSpeed: 38
+    lavaRiseSpeed: 36
   },
   {
     zoneIndex: 10,
     name: 'Zona 10: Tormenta de Metal',
     subtitle: '¡La lluvia comienza a caer!',
-    startY: -70000,
-    endY: -77500,
+    startY: -144000,
+    endY: -156000, // 7200m - 7800m
     bgColorTop: '#0f172a',
     bgColorBottom: '#1e1b4b',
     ambientLight: 'rgba(56, 189, 248, 0.1)',
-    gearSpeedMult: 2.1,
+    gearSpeedMult: 2.0,
     explosiveChance: 0.25,
-    smallGearChance: 0.65,
+    smallGearChance: 0.6,
     electricChance: 0.2,
-    lavaRiseSpeed: 42,
+    lavaRiseSpeed: 40,
     hasRain: true
   },
   {
     zoneIndex: 11,
     name: 'Zona 11: Cascadas de Aceite',
     subtitle: '¡Cuidado! Todo está resbaladizo',
-    startY: -77500,
-    endY: -85000,
+    startY: -156000,
+    endY: -168000, // 7800m - 8400m
     bgColorTop: '#1e1b4b',
     bgColorBottom: '#020617',
     ambientLight: 'rgba(99, 102, 241, 0.15)',
-    gearSpeedMult: 2.3,
+    gearSpeedMult: 2.2,
     explosiveChance: 0.3,
-    smallGearChance: 0.7,
+    smallGearChance: 0.65,
     electricChance: 0.25,
-    lavaRiseSpeed: 48,
+    lavaRiseSpeed: 45,
     hasRain: true,
     isSlippery: true
   },
@@ -179,24 +179,27 @@ export const ZONES: ZoneConfig[] = [
     zoneIndex: 12,
     name: 'Zona 12: El Olvido Final',
     subtitle: 'El desafío definitivo bajo la tormenta',
-    startY: -85000,
-    endY: -90000,
+    startY: -168000,
+    endY: -180000, // 8400m - 9000m
     bgColorTop: '#000000',
     bgColorBottom: '#020617',
     ambientLight: 'rgba(239, 68, 68, 0.1)',
-    gearSpeedMult: 2.6,
-    explosiveChance: 0.4,
-    smallGearChance: 0.8,
+    gearSpeedMult: 2.5,
+    explosiveChance: 0.35,
+    smallGearChance: 0.7,
     electricChance: 0.3,
-    lavaRiseSpeed: 55,
+    lavaRiseSpeed: 50,
     hasRain: true,
     isSlippery: true
   }
 ];
 
 export function getZoneForY(y: number): ZoneConfig {
+  if (y >= ZONES[0].startY) {
+    return ZONES[0];
+  }
   for (const zone of ZONES) {
-    if (y <= zone.startY && y > zone.endY) {
+    if (y < zone.startY && y >= zone.endY) {
       return zone;
     }
   }
@@ -245,9 +248,7 @@ export function generateLevel(): { gears: Gear[]; collectibles: Collectible[] } 
   let currentY = startGear.y;
   let stepIdx = 0;
 
-  const totalGearsTarget = 1000;
-
-  while (gears.length < totalGearsTarget && currentY > -90000) {
+  while (currentY > -180000) {
     const zone = getZoneForY(currentY);
     const step = climbingSteps[stepIdx % climbingSteps.length];
     stepIdx++;
@@ -285,7 +286,7 @@ export function generateLevel(): { gears: Gear[]; collectibles: Collectible[] } 
       type = 'SMALL';
     }
 
-    if (zone.zoneIndex >= 6 && Math.random() < 0.4) {
+    if (zone.zoneIndex >= 7 && Math.random() < 0.4) {
       type = 'FROZEN';
     } else if (zone.zoneIndex >= 4 && Math.random() < zone.explosiveChance) {
       type = 'EXPLOSIVE';
