@@ -16,6 +16,8 @@ import { VictoryModal } from './components/VictoryModal';
 import { PauseModal } from './components/PauseModal';
 import { ContactModal } from './components/ContactModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
+import { AdminDashboardModal } from './components/AdminDashboardModal';
+import { logVisit } from './game/firebase';
 
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -41,7 +43,30 @@ export default function App() {
   const [showHighScore, setShowHighScore] = useState(false);
   const [showContact, setShowContact] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+
+  // Log visit & Check hidden /admin route on boot
+  useEffect(() => {
+    logVisit();
+
+    const checkAdminRoute = () => {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (path.includes('admin') || hash.includes('admin')) {
+        setShowAdminDashboard(true);
+      }
+    };
+
+    checkAdminRoute();
+    window.addEventListener('popstate', checkAdminRoute);
+    window.addEventListener('hashchange', checkAdminRoute);
+
+    return () => {
+      window.removeEventListener('popstate', checkAdminRoute);
+      window.removeEventListener('hashchange', checkAdminRoute);
+    };
+  }, []);
 
   // Initialize Canvas & Game Engine
   useEffect(() => {
@@ -238,6 +263,13 @@ export default function App() {
           <LeaderboardModal
             currentScore={scoreState.score}
             onClose={() => setShowLeaderboard(false)}
+          />
+        )}
+
+        {/* Hidden Admin Dashboard Modal (/admin or #admin) */}
+        {showAdminDashboard && (
+          <AdminDashboardModal
+            onClose={() => setShowAdminDashboard(false)}
           />
         )}
       </div>

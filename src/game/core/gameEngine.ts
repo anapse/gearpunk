@@ -18,6 +18,7 @@ import {
 import { generateLevel, getZoneForY } from '../level/levelGenerator';
 import { PixelRenderer } from '../rendering/pixelRenderer';
 import { soundManager } from '../audio/soundManager';
+import { logGameSession } from '../firebase';
 import confetti from 'canvas-confetti';
 
 const STORAGE_KEY_HIGH_SCORE = 'gearrush_high_score';
@@ -935,6 +936,7 @@ export class GameEngine {
     soundManager.stopMusic();
     soundManager.playGameOver();
     this.savePersistentData();
+    logGameSession(this.scoreState.score, this.scoreState.height);
     this.notifyUI();
   }
 
@@ -943,6 +945,7 @@ export class GameEngine {
     soundManager.playMilestone();
     confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
     this.savePersistentData();
+    logGameSession(this.scoreState.score, this.scoreState.height);
     this.notifyUI();
   }
 

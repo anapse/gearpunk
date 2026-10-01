@@ -2,13 +2,13 @@
   "entities": {
     "LeaderboardEntry": {
       "title": "LeaderboardEntry",
-      "description": "High score leaderboard entry for Top 50 players in Gear Rush",
+      "description": "High score leaderboard entry for players in Gear Rush",
       "type": "object",
       "properties": {
         "playerName": {
           "type": "string",
           "minLength": 1,
-          "maxLength": 20,
+          "maxLength": 30,
           "description": "Display name of the player"
         },
         "score": {
@@ -26,12 +26,66 @@
         }
       },
       "required": ["playerName", "score", "height", "createdAt"]
+    },
+    "VisitLog": {
+      "title": "VisitLog",
+      "description": "Analytics log for app visits and pageviews",
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "Date string YYYY-MM-DD"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Time of visit"
+        },
+        "userAgent": {
+          "type": "string",
+          "description": "Browser user agent summary"
+        }
+      },
+      "required": ["date", "timestamp"]
+    },
+    "GameSessionLog": {
+      "title": "GameSessionLog",
+      "description": "Session tracking log every time a game is played",
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "Date string YYYY-MM-DD"
+        },
+        "score": {
+          "type": "integer",
+          "description": "Score achieved in session"
+        },
+        "height": {
+          "type": "integer",
+          "description": "Height in meters"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Time session completed"
+        }
+      },
+      "required": ["date", "score", "height", "timestamp"]
     }
   },
   "firestore": {
     "/leaderboard/{entryId}": {
       "schema": "LeaderboardEntry",
-      "description": "Top 50 high scores across all players"
+      "description": "High scores leaderboard"
+    },
+    "/analytics_visits/{visitId}": {
+      "schema": "VisitLog",
+      "description": "Visit log records"
+    },
+    "/analytics_games/{gameId}": {
+      "schema": "GameSessionLog",
+      "description": "Game session logs"
     }
   }
 }

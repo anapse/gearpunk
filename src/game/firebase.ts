@@ -7,8 +7,9 @@ import {
   limit,
   getDocs,
   addDoc,
-  serverTimestamp,
+  deleteDoc,
   doc,
+  serverTimestamp,
   getDocFromServer,
   Timestamp
 } from 'firebase/firestore';
@@ -62,7 +63,24 @@ export interface LeaderboardRecord {
   createdAt?: Timestamp | Date | string;
 }
 
+export interface VisitRecord {
+  id?: string;
+  date: string;
+  timestamp?: Timestamp | Date | string;
+  userAgent?: string;
+}
+
+export interface GameSessionRecord {
+  id?: string;
+  date: string;
+  score: number;
+  height: number;
+  timestamp?: Timestamp | Date | string;
+}
+
 const LEADERBOARD_COLLECTION = 'leaderboard';
+const VISITS_COLLECTION = 'analytics_visits';
+const GAMES_COLLECTION = 'analytics_games';
 
 /**
  * Fetch Top 50 high scores ordered by score descending
@@ -92,8 +110,47 @@ export async function getTop50Leaderboard(): Promise<LeaderboardRecord[]> {
 }
 
 /**
+ * Fetch ALL leaderboard entries (for admin ranking view)
+ */
+export async function getAllLeaderboardEntries(): Promise<LeaderboardRecord[]> {
+  try {
+    const q = query(
+      collection(db, LEADERBOARD_COLLECTION),
+      orderBy('score', 'desc'),
+      limit(200)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        playerName: data.playerName || 'Jugador',
+        score: Number(data.score) || 0,
+        height: Number(data.height) || 0,
+        createdAt: data.createdAt
+      };
+    });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.LIST, LEADERBOARD_COLLECTION);
+    return [];
+  }
+}
+
+/**
+ * Delete a leaderboard entry (Admin action)
+ */
+export async function deleteLeaderboardEntry(id: string): Promise<boolean> {
+  try {
+    await deleteDoc(doc(db, LEADERBOARD_COLLECTION, id));
+    return true;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, LEADERBOARD_COLLECTION);
+    return false;
+  }
+}
+
+/**
  * Check if a given score qualifies for the Top 50 leaderboard.
- * Returns true if leaderboard has less than 50 entries OR score > 50th score.
  */
 export async function checkIfQualifiesForTop50(score: number): Promise<boolean> {
   if (score <= 0) return false;
@@ -115,7 +172,7 @@ export async function checkIfQualifiesForTop50(score: number): Promise<boolean> 
  */
 export async function submitLeaderboardScore(playerName: string, score: number, height: number): Promise<boolean> {
   try {
-    const sanitizedName = playerName.trim().substring(0, 20) || 'Anónimo';
+    const sanitizedName = playerName.trim().substring(0, 30) || 'Anónimo';
     await addDoc(collection(db, LEADERBOARD_COLLECTION), {
       playerName: sanitizedName,
       score: Math.max(0, Math.floor(score)),
@@ -126,5 +183,120 @@ export async function submitLeaderboardScore(playerName: string, score: number, 
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, LEADERBOARD_COLLECTION);
     return false;
+  }
+}
+
+/**
+ * Log a user visit (call once per session boot)
+ */
+export async function logVisit(): Promise<void> {
+  try {
+    // Only log once per session
+    if (sessionStorage.getItem('gearrush_visit_logged')) return;
+    sessionStorage.setItem('gearrush_visit_logged', 'true');
+
+    const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    await addDoc(collection(db, VISITS_COLLECTION), {
+      date: todayStr,
+      timestamp: serverTimestamp(),
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 100) : 'unknown'
+    });
+  } catch (error) {
+    console.warn('Analytics visit log error:', error);
+  }
+}
+
+/**
+ * Log a completed game session
+ */
+export async function logGameSession(score: number, height: number): Promise<void> {
+  try {
+    const todayStr = new Date().toISOString().split('T')[0];
+    await addDoc(collection(db, GAMES_COLLECTION), {
+      date: todayStr,
+      score: Math.max(0, Math.floor(score)),
+      height: Math.max(0, Math.floor(height)),
+      timestamp: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn('Analytics game session log error:', error);
+  }
+}
+
+/**
+ * Fetch Analytics data for Admin Dashboard
+ */
+export async function getAnalyticsData() {
+  try {
+    const [visitsSnap, gamesSnap, leaderboard] = await Promise.all([
+      getDocs(query(collection(db, VISITS_COLLECTION), orderBy('timestamp', 'desc'), limit(500))),
+      getDocs(query(collection(db, GAMES_COLLECTION), orderBy('timestamp', 'desc'), limit(500))),
+      getAllLeaderboardEntries()
+    ]);
+
+    const visits = visitsSnap.docs.map(d => d.data() as VisitRecord);
+    const games = gamesSnap.docs.map(d => d.data() as GameSessionRecord);
+
+    // Calculate daily visits breakdown
+    const dailyVisitsMap: Record<string, number> = {};
+    visits.forEach(v => {
+      const d = v.date || 'Desconocido';
+      dailyVisitsMap[d] = (dailyVisitsMap[d] || 0) + 1;
+    });
+
+    // Calculate daily games breakdown
+    const dailyGamesMap: Record<string, number> = {};
+    let totalScoreAllGames = 0;
+    let totalHeightAllGames = 0;
+
+    games.forEach(g => {
+      const d = g.date || 'Desconocido';
+      dailyGamesMap[d] = (dailyGamesMap[d] || 0) + 1;
+      totalScoreAllGames += g.score || 0;
+      totalHeightAllGames += g.height || 0;
+    });
+
+    // Individual player stats (grouping leaderboard by name)
+    const playerStatsMap: Record<string, { name: string; gamesCount: number; maxScore: number; maxHeight: number }> = {};
+    leaderboard.forEach(entry => {
+      const nameKey = entry.playerName.trim().toLowerCase();
+      if (!playerStatsMap[nameKey]) {
+        playerStatsMap[nameKey] = {
+          name: entry.playerName,
+          gamesCount: 1,
+          maxScore: entry.score,
+          maxHeight: entry.height
+        };
+      } else {
+        playerStatsMap[nameKey].gamesCount += 1;
+        playerStatsMap[nameKey].maxScore = Math.max(playerStatsMap[nameKey].maxScore, entry.score);
+        playerStatsMap[nameKey].maxHeight = Math.max(playerStatsMap[nameKey].maxHeight, entry.height);
+      }
+    });
+
+    return {
+      totalVisits: visits.length,
+      totalGames: games.length,
+      totalPoints: totalScoreAllGames,
+      avgScore: games.length > 0 ? Math.round(totalScoreAllGames / games.length) : 0,
+      avgHeight: games.length > 0 ? Math.round(totalHeightAllGames / games.length) : 0,
+      dailyVisits: Object.entries(dailyVisitsMap).map(([date, count]) => ({ date, count })),
+      dailyGames: Object.entries(dailyGamesMap).map(([date, count]) => ({ date, count })),
+      playerStats: Object.values(playerStatsMap).sort((a, b) => b.maxScore - a.maxScore),
+      leaderboard
+    };
+  } catch (error) {
+    console.error('Error loading analytics:', error);
+    return {
+      totalVisits: 0,
+      totalGames: 0,
+      totalPoints: 0,
+      avgScore: 0,
+      avgHeight: 0,
+      dailyVisits: [],
+      dailyGames: [],
+      playerStats: [],
+      leaderboard: []
+    };
   }
 }
