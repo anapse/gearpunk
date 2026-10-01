@@ -126,7 +126,7 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({
 
       {/* Footer Subtitle: Dedicado a Violenti */}
       <div className="text-[11px] text-amber-400 font-chakra font-bold tracking-wider text-center z-10 border-t border-stone-800/80 pt-1.5 w-full">
-        Dedicado a Violenti
+        Dedicado a Violenty
       </div>
     </div>
   );

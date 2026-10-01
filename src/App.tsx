@@ -187,7 +187,6 @@ export default function App() {
               soundManager.playButtonClick();
               engineRef.current?.pauseGame();
             }}
-            onShowLeaderboard={() => setShowLeaderboard(true)}
           />
         )}
 

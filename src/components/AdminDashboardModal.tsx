@@ -15,14 +15,12 @@ import {
   Activity,
   BarChart3,
   Calendar,
-  Trash2,
   RefreshCw,
   Search,
-  ShieldAlert,
-  Check
+  ShieldAlert
 } from 'lucide-react';
 import { soundManager } from '../game/audio/soundManager';
-import { getAnalyticsData, deleteLeaderboardEntry, LeaderboardRecord } from '../game/firebase';
+import { getAnalyticsData, LeaderboardRecord } from '../game/firebase';
 
 interface AdminDashboardModalProps {
   onClose: () => void;
@@ -101,13 +99,6 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ onClos
     setIsAuthenticated(false);
     setUsernameInput('');
     setPasswordInput('');
-  };
-
-  const handleDeleteRecord = async (id: string) => {
-    if (!window.confirm('¿Seguro que deseas eliminar esta puntuación del ranking?')) return;
-    soundManager.playButtonClick();
-    await deleteLeaderboardEntry(id);
-    fetchAnalytics();
   };
 
   // Login Screen
@@ -373,8 +364,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ onClos
                 ) : (
                   filteredLeaderboard.map((item, idx) => (
                     <div
-                      key={item.id || idx}
-                      className="bg-stone-950 p-2 rounded-xl border border-stone-800 flex items-center justify-between gap-2"
+                      key={`admin-rank-${item.id || 'item'}-${idx}`}
+                      className="bg-stone-950 p-2.5 rounded-xl border border-stone-800 flex items-center justify-between gap-2"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="w-6 h-6 rounded bg-stone-800 text-amber-400 font-black text-xs font-chakra flex items-center justify-center shrink-0">
@@ -390,19 +381,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ onClos
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="text-right shrink-0">
                         <span className="text-xs font-black text-amber-300 font-chakra">
                           {item.score.toLocaleString()} pts
                         </span>
-                        {item.id && (
-                          <button
-                            onClick={() => handleDeleteRecord(item.id!)}
-                            className="p-1 rounded bg-stone-900 hover:bg-red-950 border border-stone-800 hover:border-red-600 text-stone-500 hover:text-red-400 transition-colors"
-                            title="Eliminar puntuación"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
                       </div>
                     </div>
                   ))
@@ -422,7 +404,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ onClos
               ) : (
                 analytics.dailyVisits.map((item, idx) => (
                   <div
-                    key={idx}
+                    key={`visit-${idx}-${item.date}`}
                     className="bg-stone-950 p-2.5 rounded-xl border border-stone-800 flex items-center justify-between text-xs font-chakra"
                   >
                     <span className="text-stone-300 font-mono">{item.date}</span>
@@ -446,7 +428,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({ onClos
               ) : (
                 analytics.playerStats.map((item, idx) => (
                   <div
-                    key={idx}
+                    key={`player-stat-${idx}-${item.name}`}
                     className="bg-stone-950 p-2.5 rounded-xl border border-stone-800 flex items-center justify-between text-xs font-chakra"
                   >
                     <div>

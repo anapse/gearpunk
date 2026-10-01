@@ -33,7 +33,6 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose, cur
     fetchScores();
   }, []);
 
-  // Mouse drag scrolling handlers for desktop
   const handlePointerDown = (e: React.PointerEvent) => {
     if (!scrollRef.current) return;
     setIsDragging(true);
@@ -125,7 +124,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose, cur
 
               return (
                 <div
-                  key={item.id || index}
+                  key={`top50-entry-${item.id || 'rec'}-${index}`}
                   className={`flex items-center justify-between p-2.5 rounded-xl border transition-colors select-none ${
                     isTop1
                       ? 'bg-amber-950/40 border-amber-500/80 shadow-[0_0_12px_rgba(245,158,11,0.2)]'

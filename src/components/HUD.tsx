@@ -1,12 +1,12 @@
 /**
  * GEAR RUSH - In-Game HUD
- * Compact layout with Hearts, Score, Altitude, Climb Counter, Powerup Badges, Top 50 Leaderboard & Pause button.
+ * Compact layout with Hearts, Score, Altitude, Climb Counter, Powerup Badges & Pause button.
  * Designed strictly to fit inside the 480px viewport without overflow.
  */
 
 import React, { useEffect, useState } from 'react';
 import { GameScoreState } from '../game/types';
-import { Pause, ArrowUpCircle, Trophy } from 'lucide-react';
+import { Pause, ArrowUpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface HUDProps {
@@ -15,7 +15,7 @@ interface HUDProps {
   onShowLeaderboard?: () => void;
 }
 
-export const HUD: React.FC<HUDProps> = ({ scoreState, onPause, onShowLeaderboard }) => {
+export const HUD: React.FC<HUDProps> = ({ scoreState, onPause }) => {
   const [prevScore, setPrevScore] = useState(0);
   const [prevHeight, setPrevHeight] = useState(0);
 
@@ -35,7 +35,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause, onShowLeaderboard
       if (heartValue >= 2) {
         hearts.push(
           <motion.span 
-            key={i} 
+            key={`heart-full-${i}`} 
             initial={{ scale: 1 }}
             animate={{ scale: [1, 1.25, 1] }}
             transition={{ repeat: Infinity, duration: 1.5 }}
@@ -46,7 +46,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause, onShowLeaderboard
         );
       } else if (heartValue === 1) {
         hearts.push(
-          <div key={i} className="relative inline-block text-sm">
+          <div key={`heart-half-${i}`} className="relative inline-block text-sm">
             <span className="text-zinc-800 opacity-90">🖤</span>
             <span className="absolute left-0 top-0 overflow-hidden w-[50%] text-red-500 drop-shadow-[0_0_4px_rgba(239,68,68,0.8)]">
               ❤️
@@ -55,7 +55,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause, onShowLeaderboard
         );
       } else {
         hearts.push(
-          <span key={i} className="text-zinc-800 opacity-50 text-sm">
+          <span key={`heart-empty-${i}`} className="text-zinc-800 opacity-50 text-sm">
             🖤
           </span>
         );
@@ -78,7 +78,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause, onShowLeaderboard
 
           {/* Subidas */}
           <motion.div 
-            key={scoreState.jumpsCount}
+            key={`jumps-${scoreState.jumpsCount}`}
             animate={{ scale: [1, 1.15, 1] }}
             className="bg-stone-900/95 border border-emerald-600/80 rounded-lg px-1.5 py-0.5 flex flex-col items-center shadow-md backdrop-blur-md min-w-[38px]"
           >
@@ -95,7 +95,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause, onShowLeaderboard
         <div className="flex items-center gap-1 shrink-0">
           {/* Score Panel */}
           <motion.div 
-            key={scoreState.score}
+            key={`score-${scoreState.score}`}
             animate={{ scale: [1, 1.2, 1] }}
             className="bg-stone-900/95 border border-amber-600/80 rounded-lg px-2 py-0.5 flex flex-col items-center shadow-md backdrop-blur-md min-w-[50px]"
           >
@@ -107,7 +107,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause, onShowLeaderboard
 
           {/* Height Panel */}
           <motion.div 
-            key={scoreState.height}
+            key={`height-${scoreState.height}`}
             animate={{ scale: [1, 1.15, 1] }}
             className="bg-stone-900/95 border border-cyan-600/80 rounded-lg px-1.5 py-0.5 flex flex-col items-center shadow-md backdrop-blur-md min-w-[42px]"
           >
@@ -118,18 +118,8 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause, onShowLeaderboard
           </motion.div>
         </div>
 
-        {/* Action Buttons: Top 50 Leaderboard + Pause */}
+        {/* Action Button: Pause */}
         <div className="flex items-center gap-1 shrink-0 pointer-events-auto">
-          {onShowLeaderboard && (
-            <button
-              onClick={onShowLeaderboard}
-              className="bg-amber-950/90 hover:bg-amber-900 active:bg-amber-950 border border-amber-500/80 text-amber-300 p-1.5 rounded-lg shadow-md transition-transform active:scale-95 cursor-pointer flex items-center justify-center"
-              title="Top 50 Jugadores"
-            >
-              <Trophy className="w-3.5 h-3.5 text-amber-400" />
-            </button>
-          )}
-
           <button
             onClick={onPause}
             className="bg-stone-800/95 hover:bg-stone-700 active:bg-stone-900 border border-stone-600 text-stone-200 p-1.5 rounded-lg shadow-md transition-transform active:scale-95 cursor-pointer flex items-center justify-center"
@@ -145,6 +135,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause, onShowLeaderboard
         <AnimatePresence>
           {scoreState.activeMagnetTimer > 0 && (
             <motion.div 
+              key="badge-magnet"
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -20, opacity: 0 }}
@@ -156,6 +147,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreState, onPause, onShowLeaderboard
           )}
           {scoreState.activeSlowMoTimer > 0 && (
             <motion.div 
+              key="badge-slowmo"
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -20, opacity: 0 }}
