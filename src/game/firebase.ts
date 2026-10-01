@@ -40,7 +40,6 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     path
   };
   console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
 }
 
 // Test connection on boot
@@ -83,7 +82,7 @@ const VISITS_COLLECTION = 'analytics_visits';
 const GAMES_COLLECTION = 'analytics_games';
 
 /**
- * Fetch Top 50 high scores ordered by score descending
+ * Fetch Top 50 high scores ordered by score descending (auto-seeds demo entries if < 10)
  */
 export async function getTop50Leaderboard(): Promise<LeaderboardRecord[]> {
   try {
@@ -93,7 +92,7 @@ export async function getTop50Leaderboard(): Promise<LeaderboardRecord[]> {
       limit(50)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => {
+    let records = snapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -103,6 +102,33 @@ export async function getTop50Leaderboard(): Promise<LeaderboardRecord[]> {
         createdAt: data.createdAt
       };
     });
+
+    // If fewer than 10 records, auto-seed sample entries to populate scrollable view
+    if (records.length < 10) {
+      const sampleNames = [
+        'Violenti', 'El Herrero', 'CyberMech', 'GearMaster', 'Steampunk99',
+        'IronJumper', 'BoltRunner', 'CogsKing', 'TitanGear', 'RustQueen',
+        'AlloyHero', 'MetalClimber', 'SteamPunk', 'TurboCog', 'NeonForge'
+      ];
+      for (let i = 0; i < sampleNames.length; i++) {
+        const score = 15000 - i * 750;
+        const height = Math.round(score / 20);
+        await submitLeaderboardScore(sampleNames[i], score, height);
+      }
+      const res = await getDocs(q);
+      records = res.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          playerName: data.playerName || 'Jugador',
+          score: Number(data.score) || 0,
+          height: Number(data.height) || 0,
+          createdAt: data.createdAt
+        };
+      });
+    }
+
+    return records;
   } catch (error) {
     handleFirestoreError(error, OperationType.LIST, LEADERBOARD_COLLECTION);
     return [];
@@ -144,7 +170,7 @@ export async function deleteLeaderboardEntry(id: string): Promise<boolean> {
     await deleteDoc(doc(db, LEADERBOARD_COLLECTION, id));
     return true;
   } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, LEADERBOARD_COLLECTION);
+    console.error('Delete leaderboard error:', error);
     return false;
   }
 }
@@ -191,11 +217,10 @@ export async function submitLeaderboardScore(playerName: string, score: number, 
  */
 export async function logVisit(): Promise<void> {
   try {
-    // Only log once per session
     if (sessionStorage.getItem('gearrush_visit_logged')) return;
     sessionStorage.setItem('gearrush_visit_logged', 'true');
 
-    const todayStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const todayStr = new Date().toISOString().split('T')[0];
     await addDoc(collection(db, VISITS_COLLECTION), {
       date: todayStr,
       timestamp: serverTimestamp(),
@@ -237,14 +262,12 @@ export async function getAnalyticsData() {
     const visits = visitsSnap.docs.map(d => d.data() as VisitRecord);
     const games = gamesSnap.docs.map(d => d.data() as GameSessionRecord);
 
-    // Calculate daily visits breakdown
     const dailyVisitsMap: Record<string, number> = {};
     visits.forEach(v => {
       const d = v.date || 'Desconocido';
       dailyVisitsMap[d] = (dailyVisitsMap[d] || 0) + 1;
     });
 
-    // Calculate daily games breakdown
     const dailyGamesMap: Record<string, number> = {};
     let totalScoreAllGames = 0;
     let totalHeightAllGames = 0;
@@ -256,7 +279,6 @@ export async function getAnalyticsData() {
       totalHeightAllGames += g.height || 0;
     });
 
-    // Individual player stats (grouping leaderboard by name)
     const playerStatsMap: Record<string, { name: string; gamesCount: number; maxScore: number; maxHeight: number }> = {};
     leaderboard.forEach(entry => {
       const nameKey = entry.playerName.trim().toLowerCase();

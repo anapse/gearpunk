@@ -1,9 +1,9 @@
 /**
  * GEAR RUSH - Top 50 Leaderboard Modal
- * Displays real-time Top 50 scores from Firebase Firestore
+ * Displays real-time Top 50 scores from Firebase Firestore with touch/drag and wheel scrolling support
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { X, Trophy, Medal, Sparkles, RefreshCw, Loader2 } from 'lucide-react';
 import { soundManager } from '../game/audio/soundManager';
 import { getTop50Leaderboard, LeaderboardRecord } from '../game/firebase';
@@ -17,6 +17,11 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose, cur
   const [records, setRecords] = useState<LeaderboardRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startY, setStartY] = useState(0);
+  const [scrollTop, setScrollTop] = useState(0);
+
   const fetchScores = async () => {
     setLoading(true);
     const data = await getTop50Leaderboard();
@@ -28,12 +33,30 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose, cur
     fetchScores();
   }, []);
 
+  // Mouse drag scrolling handlers for desktop
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setStartY(e.clientY);
+    setScrollTop(scrollRef.current.scrollTop);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    const deltaY = e.clientY - startY;
+    scrollRef.current.scrollTop = scrollTop - deltaY;
+  };
+
+  const handlePointerUp = () => {
+    setIsDragging(false);
+  };
+
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center p-3 bg-black/85 backdrop-blur-sm select-none">
       <div className="bg-stone-900 border-2 border-amber-600/80 rounded-2xl w-full max-w-[420px] max-h-[85vh] flex flex-col shadow-[0_0_40px_rgba(217,119,6,0.3)] overflow-hidden text-stone-200">
         
         {/* Header */}
-        <div className="bg-stone-950 p-3.5 border-b border-stone-800 flex items-center justify-between">
+        <div className="bg-stone-950 p-3.5 border-b border-stone-800 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/50 flex items-center justify-center">
               <Trophy className="w-5 h-5 text-amber-400 animate-pulse" />
@@ -71,8 +94,16 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose, cur
           </div>
         </div>
 
-        {/* Content List */}
-        <div className="p-3 overflow-y-auto flex-1 custom-scrollbar space-y-1.5">
+        {/* Content List with Scrollable View, Touch Pan & Mouse Drag Support */}
+        <div 
+          ref={scrollRef}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+          className="p-3 overflow-y-auto flex-1 max-h-[55vh] space-y-1.5 scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden touch-auto cursor-grab active:cursor-grabbing"
+          style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}
+        >
           {loading ? (
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-stone-400">
               <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
@@ -95,7 +126,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose, cur
               return (
                 <div
                   key={item.id || index}
-                  className={`flex items-center justify-between p-2.5 rounded-xl border transition-colors ${
+                  className={`flex items-center justify-between p-2.5 rounded-xl border transition-colors select-none ${
                     isTop1
                       ? 'bg-amber-950/40 border-amber-500/80 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
                       : isTop2
@@ -108,7 +139,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose, cur
                   }`}
                 >
                   {/* Rank & Name */}
-                  <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex items-center gap-2.5 min-w-0 pointer-events-none">
                     <div
                       className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs font-chakra shrink-0 ${
                         isTop1
@@ -134,7 +165,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose, cur
                   </div>
 
                   {/* Score */}
-                  <div className="text-right shrink-0">
+                  <div className="text-right shrink-0 pointer-events-none">
                     <span className="text-sm font-black font-chakra text-amber-400">
                       {item.score.toLocaleString()}
                     </span>
@@ -147,14 +178,14 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ onClose, cur
         </div>
 
         {/* Footer */}
-        <div className="bg-stone-950 p-2.5 border-t border-stone-800 flex justify-between items-center text-xs">
+        <div className="bg-stone-950 p-2.5 border-t border-stone-800 flex justify-between items-center text-xs shrink-0">
           <span className="text-[10px] text-stone-500 font-mono">Mostrando Top 50 mundial</span>
           <button
             onClick={() => {
               soundManager.playButtonClick();
               onClose();
             }}
-            className="gear-btn gear-btn-green py-1.5 px-4 rounded-lg font-bold font-chakra text-xs"
+            className="gear-btn gear-btn-green py-1.5 px-4 rounded-lg font-bold font-chakra text-xs cursor-pointer"
           >
             CERRAR
           </button>

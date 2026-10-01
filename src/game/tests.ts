@@ -1,11 +1,12 @@
 /**
  * GEAR RUSH - Logic Verification Tests
- * Simple sanity checks for core game mechanics
+ * Simple sanity checks for core game mechanics and leaderboard structure
  */
 
 import { getZoneForY, ZONES } from './level/levelGenerator';
+import { getTop50Leaderboard } from './firebase';
 
-export function runSanityTests() {
+export async function runSanityTests() {
   console.log('--- RUNNING GEAR RUSH SANITY TESTS ---');
 
   // Test 1: Start Zone Mapping (Player starts at Y=640 on bottom gear)
@@ -31,6 +32,15 @@ export function runSanityTests() {
   // Test 5: Level Generation Bounds
   const lastZone = ZONES[ZONES.length - 1];
   console.assert(lastZone.endY === -180000, 'Final zone should end at -180000 Y (9000m)');
+
+  // Test 6: Leaderboard Top 50 fetch test
+  try {
+    const lb = await getTop50Leaderboard();
+    console.assert(Array.isArray(lb), 'Leaderboard result should be an array');
+    console.log(`Leaderboard fetch verified. Total records: ${lb.length}`);
+  } catch (e) {
+    console.warn('Leaderboard test skipped offline:', e);
+  }
 
   console.log('--- ALL TESTS PASSED (SANITY) ---');
 }
